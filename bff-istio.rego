@@ -58,4 +58,8 @@ allow if {
     input.attributes.request.http.method == "POST"
     graphql.schema_is_valid(schema) == true
     graphql.is_valid(input.parsed_body.query, schema) == true
+
+    request := graphql.parse(input.parsed_body.query, schema)
+    op := request.Operations[_]
+    op.Operation == "query"
 )
