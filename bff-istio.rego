@@ -61,7 +61,7 @@ allow if {
 
     request := graphql.parse(input.parsed_body.query, schema)
     print(request)
-    op := request.Operations[_]
-    op.Operation == "query"
+    # op := request.Operations[_]
+    # op.Operation == "query"
 }
 
