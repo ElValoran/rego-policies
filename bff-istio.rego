@@ -60,6 +60,6 @@ allow if {
     graphql.is_valid(input.parsed_body.query, schema) == true
 
     request := graphql.parse(input.parsed_body.query, schema)
-    # op := request.Operations[_]
-    # op.Operation == "query"
+    op := request.Operations[_]
+    op.Operation == "query"
 }
