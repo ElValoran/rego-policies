@@ -2,7 +2,7 @@ package istio.authz
 
 import rego.v1
 
-default allow := true
+default allow := false
 
 allow if {
 	input.parsed_path[0] == "graphql"
