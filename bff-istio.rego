@@ -52,22 +52,39 @@ input BasicAuthInput {
     password: String!
 }
 `
+request := graphql.parse(input.parsed_body.query, schema)
+op := request[0].Operations[_]
+selection := op.SelectionSet[_]
 
 allow if {
     input.parsed_path[0] == "graphql"
     input.attributes.request.http.method == "POST"
     graphql.schema_is_valid(schema) == true
-
-    # parsed := graphql.parse_and_verify(input.query, schema)
-    # is_valid = parsed[0]
-    # is_valid
-
     graphql.is_valid(input.parsed_body.query, schema) == true
 
-    # query := parsed[1]
-    request := graphql.parse(input.parsed_body.query, schema)
     print(request)
-    op := request[0].Operations[_]
-    op.Operation == "query"
+    
+    is_allowed_query
 }
 
+is_allowed_query if {
+    op.Operation == "query"
+    is_allowed_query_operation
+}
+
+is_allowed_query_operation if {
+    selection.Name == "getProducts"
+}
+
+is_allowed_mutation if {
+    op.Operation == "mutation"
+    is_allowed_mutation_operation
+}
+
+is_allowed_mutation_operation if {
+    selection.Name == "login"
+}
+
+is_allowed_mutation_operation if {
+    selection.Name == "addProductToCart"
+}
