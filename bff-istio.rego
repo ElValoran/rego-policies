@@ -57,14 +57,22 @@ op := request[0].Operations[_]
 selection := op.SelectionSet[_]
 
 allow if {
+    graphql_is_valid
+    is_allowed_query
+}
+
+allow if {
+    graphql_is_valid
+    is_allowed_mutation
+}
+
+graphql_is_valid if {
     input.parsed_path[0] == "graphql"
     input.attributes.request.http.method == "POST"
     graphql.schema_is_valid(schema) == true
     graphql.is_valid(input.parsed_body.query, schema) == true
 
     print(request)
-    
-    is_allowed_query
 }
 
 is_allowed_query if {
