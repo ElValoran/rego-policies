@@ -73,7 +73,7 @@ is_allowed_query if {
 }
 
 is_allowed_query_operation if {
-    selection.Name == "getProducts"
+    selection.Alias == "getProducts"
 }
 
 is_allowed_mutation if {
@@ -82,9 +82,9 @@ is_allowed_mutation if {
 }
 
 is_allowed_mutation_operation if {
-    selection.Name == "login"
+    selection.Alias == "login"
 }
 
 is_allowed_mutation_operation if {
-    selection.Name == "addProductToCart"
+    selection.Alias == "addProductToCart"
 }
