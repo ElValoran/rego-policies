@@ -1,8 +1,8 @@
-# package istio.authz
+package istio.authz
 
-# import rego.v1
+import rego.v1
 
-# default allow := false
+default allow := true
 
 # schema := `
 # type Product {
