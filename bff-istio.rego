@@ -46,6 +46,12 @@ op := request[0].Operations[_]
 selection := op.SelectionSet[_]
 
 allow if {
+    # input.attributes.destination.principal == "spiffe://cluster.local/ns/default/sa/backend-for-frontend-sa"
+    input.attributes.request.http.headers.path == "/graphql"
+    graphql_is_valid
+}
+
+allow if {
     graphql_is_valid
     is_allowed_query
 }
