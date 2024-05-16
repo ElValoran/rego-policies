@@ -2,7 +2,7 @@ package istio.authz
 
 import rego.v1
 
-default allow := true
+default allow := false
 
 schema := `
 type Product {
