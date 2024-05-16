@@ -4,17 +4,6 @@ import rego.v1
 
 default allow := false
 
-# allow if {
-# 	input.parsed_path[0] == "graphql"
-# 	input.attributes.request.http.method == "POST"
-# 	input.parsed_body.query == "query{\r\n    getProducts{\r\n        _id\r\n        name\r\n        description\r\n    }\r\n}"
-# }
-
-# allow if {
-#     input.parsed_path[0] == "graphql"
-#     input.attributes.request.http.method == "POST"
-# }
-
 schema := `
 type Product {
     _id: ID
@@ -95,4 +84,41 @@ is_allowed_mutation_operation if {
 
 is_allowed_mutation_operation if {
     selection.Alias == "addProductToCart"
+    claims.role == "customer"
+}
+
+claims := payload if {
+	# Verify the signature on the Bearer token. In this example the secret is
+	# hardcoded into the policy however it could also be loaded via data or
+	# an environment variable. Environment variables can be accessed using
+	# the `opa.runtime()` built-in function.
+	io.jwt.verify_hs256(bearer_token, `-----BEGIN PUBLIC KEY-----
+MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAwV2CrH3goELMrWt/J2mA
+y/sVko9WjyrzbRDi0WOHZFAOuqYt5Qro30OJtZ3ejrKwW9UdG76c1RTu8WjkqWHW
+TedyfaSnip+op/vqWjze1EiR6+i6zocALocNQokQe7Ar7FWSPzhTa6wCX3edSeAC
+54C7VndoBsgUYJc2+JRznSzH54j7QfUMayQNg6jsnf7m+BFtYqHlROCTGe/ca/78
+0ud0tsLalpaCsB83dCcJi8HoNlVE6+Yv1lCEUlZc/5lLXFnBdnXfhLzlItPgR4Ql
+GIra90wWDfArKcinPP+9L4gYjTCSdSTfmrH8ooMWeikNYfHgrK9odgWwuNw2Jo2i
+MwIDAQAB
+-----END PUBLIC KEY-----`)
+
+	# This statement invokes the built-in function `io.jwt.decode` passing the
+	# parsed bearer_token as a parameter. The `io.jwt.decode` function returns an
+	# array:
+	#
+	#	[header, payload, signature]
+	#
+	# In Rego, you can pattern match values using the `=` and `:=` operators. This
+	# example pattern matches on the result to obtain the JWT payload.
+	[_, payload, _] := io.jwt.decode(bearer_token)
+}
+
+# Source: https://play.openpolicyagent.org/
+bearer_token := t if {
+	# Bearer tokens are contained inside of the HTTP Authorization header. This rule
+	# parses the header and extracts the Bearer token value. If no Bearer token is
+	# provided, the `bearer_token` value is undefined.
+	v := input.attributes.request.http.headers.authorization
+	startswith(v, "Bearer ")
+	t := substring(v, count("Bearer "), -1)
 }
