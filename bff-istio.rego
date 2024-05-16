@@ -46,19 +46,10 @@ op := request[0].Operations[_]
 selection := op.SelectionSet[_]
 
 allow if {
-    # input.attributes.destination.principal == "spiffe://cluster.local/ns/default/sa/backend-for-frontend-sa"
+    input.attributes.destination.principal == "spiffe://cluster.local/ns/default/sa/backend-for-frontend-sa"
     input.attributes.request.http.headers.path == "/graphql"
     graphql_is_valid
-}
-
-allow if {
-    graphql_is_valid
-    is_allowed_query
-}
-
-allow if {
-    graphql_is_valid
-    is_allowed_mutation
+    is_allowed_mutation_or_query
 }
 
 graphql_is_valid if {
@@ -68,6 +59,14 @@ graphql_is_valid if {
     graphql.is_valid(input.parsed_body.query, schema) == true
 
     print(request)
+}
+
+is_allowed_mutation_or_query if {
+    is_allowed_query
+}
+
+allow if {
+    is_allowed_mutation
 }
 
 is_allowed_query if {
@@ -91,6 +90,11 @@ is_allowed_mutation_operation if {
 is_allowed_mutation_operation if {
     selection.Alias == "addProductToCart"
     claims.role == "customer"
+}
+
+is_allowed_mutation_operation if {
+    selection.Alias == "createProduct"
+    claims.role == "product-manager"
 }
 
 claims := payload if {
