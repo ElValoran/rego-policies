@@ -33,14 +33,20 @@ MwIDAQAB
 }
 
 allow if {
-    claims.role == "product-manager"
+    claims.role == "CUSTOMER_SUPPORT"
+    input.method == "POST"
+    input.path == "/productOrders"
+}
+
+allow if {
+    claims.role == "PRODUCT_MANAGER"
     input.method == "POST"
     input.path == "/productOffers"
 }
 
 allow if {
 	print(claims)
-	claims.role == "customer"
+	claims.role == "CUSTOMER"
     input.method == "POST"
     input.path == "/shoppingCarts"
 }

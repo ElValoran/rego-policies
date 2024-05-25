@@ -89,14 +89,15 @@ is_allowed_mutation_operation if {
 
 is_allowed_mutation_operation if {
     selection.Alias == "addProductToCart"
-    claims.role == "customer"
+    claims.role == "CUSTOMER"
 }
 
 is_allowed_mutation_operation if {
     selection.Alias == "createProduct"
-    claims.role == "product-manager"
+    claims.role == "PRODUCT_MANAGER"
 }
 
+# Source: https://play.openpolicyagent.org/
 claims := payload if {
 	# Verify the signature on the Bearer token. In this example the secret is
 	# hardcoded into the policy however it could also be loaded via data or
